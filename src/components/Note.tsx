@@ -1,12 +1,12 @@
 "use client";
 
 import type { INote } from "@/models/Note";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNoteCardAnimation } from "./animations";
 import gsap from "gsap";
 
-export const Note = ({ note }: { note: INote }) => {
+export const Note = React.memo(({ note }: { note: INote }) => {
     const [currentNote, setCurrentNote] = useState<INote>(note);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
@@ -99,4 +99,4 @@ export const Note = ({ note }: { note: INote }) => {
             </button>
         </div>
     );
-};
+});

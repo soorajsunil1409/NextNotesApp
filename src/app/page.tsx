@@ -1,51 +1,60 @@
 "use client";
 
-import AddNoteCard from "@/components/AddNoteCard";
 import { Note } from "@/components/Note";
 import type { INote } from "@/models/Note";
 import { Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import {
     useMainAnimation,
     useNotesAnimation,
     useAddButtonAnimation,
 } from "@/components/animations";
+import { useSearchStore } from "@/stores/useSearchStore";
+import dynamic from "next/dynamic";
+
+const AddNoteCard = dynamic(() => import("@/components/AddNoteCard"));
 
 const HomePage = () => {
     const { data: session, status } = useSession();
     const [notes, setNotes] = useState<INote[]>([]);
-    const [filteredNotes, setFilteredNotes] = useState<INote[]>([]);
     const [addNotesPressed, setAddNotesPressed] = useState<boolean>(false);
-    const [searchFilter, setSearchFilter] = useState<String>("");
+    const { query } = useSearchStore();
 
     const containerRef = useMainAnimation();
     const notesContainerRef = useNotesAnimation();
     const addButtonRef = useAddButtonAnimation();
 
-    useEffect(() => {
-        const getNotes = async () => {
-            try {
-                const res = await fetch("/api/notes");
-                const { data, message }: { data: INote[]; message: string } =
-                    await res.json();
+    const getNotes = useCallback(async () => {
+        try {
+            const res = await fetch("/api/notes");
+            const { data, message }: { data: INote[]; message: string } =
+                await res.json();
 
-                if (res.ok) {
-                    setNotes(data);
-                    setFilteredNotes(data);
-                    toast.success(message);
-                } else {
-                    toast.error(message);
-                }
-            } catch (err: any) {
-                toast.error(err);
-                console.log(err);
+            if (res.ok) {
+                setNotes(data);
+                toast.success(message);
+            } else {
+                toast.error(message);
             }
-        };
+        } catch (err: any) {
+            toast.error(err);
+            console.log(err);
+        }
+    }, []);
 
-        getNotes();
-    }, [status, session]);
+    useEffect(() => {
+        if (status === "authenticated") getNotes();
+    }, [status, getNotes]);
+
+    const filteredNotes = useMemo(() => {
+        return notes.filter(
+            (note: INote) =>
+                note.title.toLowerCase().includes(query.toLowerCase()) ||
+                note.description.toLowerCase().includes(query.toLowerCase())
+        );
+    }, [notes, query]);
 
     return (
         <div
@@ -68,11 +77,11 @@ const HomePage = () => {
                         />
                     )}
 
-                    {notes?.map((note) => (
+                    {filteredNotes?.map((note) => (
                         <Note key={note.notes_id} note={note} />
                     ))}
 
-                    {notes?.length === 0 && !addNotesPressed && (
+                    {filteredNotes?.length === 0 && !addNotesPressed && (
                         <div className="col-span-full text-center py-12 text-gray-400">
                             No notes available. Click the + button to add your
                             first note.

@@ -3,9 +3,11 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import ThemeToggle from "./ThemeToggle";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 const Navbar = () => {
     const { data: session, status } = useSession();
+    const { query, setQuery } = useSearchStore();
 
     const handleSignIn = () => {
         signIn("google");
@@ -20,6 +22,8 @@ const Navbar = () => {
                 type="text"
                 className="p-3 px-6 bg-secondary w-[300px] outline-0 text-primary rounded-3xl"
                 placeholder="Search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
             />
             <div className="flex gap-3">
                 {status === "authenticated" ? (
