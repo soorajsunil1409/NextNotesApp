@@ -1,0 +1,53 @@
+import { connectMongo } from "@/lib/DB";
+import { Note } from "@/models/Note";
+import { authOption } from "@/utils/auth";
+import { requireAuth } from "@/utils/authSession";
+import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+
+
+export async function GET(request: NextRequest) {
+    try {
+        await connectMongo();
+
+        const session = await requireAuth(request);
+        const notes = await Note.find({ email: session.user?.email });
+        
+        return NextResponse.json({data: notes, message: "Notes fetched successfully"}, {status: 200})
+    } catch (error) {
+        return NextResponse.json({data: [], message: error}, {status: 500})
+    }
+}
+
+export async function PUT(request: NextRequest) {
+    try {
+        await connectMongo();
+        const session = await requireAuth(request);
+        
+        const {note_id, changes} = await request.json();
+
+        const result = await Note.findOneAndUpdate(
+            { notes_id: note_id, email: session.user?.email },
+            { $set: changes }
+        );
+    
+        return NextResponse.json({message: "Note Changed successfully"}, {status: 200});
+    } catch (error) {
+        return NextResponse.json({message: error}, {status: 500})
+    }
+}
+
+export async function POST(request: NextRequest) {
+    try {
+        await connectMongo();
+        
+        await requireAuth(request);
+        let newNote = await request.json();
+
+        await Note.create(newNote);
+    
+        return NextResponse.json({data: newNote, message: "Note added successfully"}, {status: 200});
+    } catch (error) {
+        return NextResponse.json({data: [], message: error}, {status: 500})
+    }
+}
