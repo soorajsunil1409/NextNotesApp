@@ -1,6 +1,6 @@
 import mongoose, { models, Schema } from "mongoose";
 
-export interface INote extends Document {
+export interface INote {
     notes_id: string,
     email: string,
     title: string,
