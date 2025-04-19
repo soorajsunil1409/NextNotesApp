@@ -1,8 +1,6 @@
 import { connectMongo } from "@/lib/DB";
 import { Note } from "@/models/Note";
-import { authOption } from "@/utils/auth";
 import { requireAuth } from "@/utils/authSession";
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 
