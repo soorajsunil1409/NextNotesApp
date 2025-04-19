@@ -1,7 +1,11 @@
-import { INote } from "@/models/Note";
+"use client";
+
+import type { INote } from "@/models/Note";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { useNoteCardAnimation } from "./animations";
+import gsap from "gsap";
 
 interface IAddNoteCard {
     setAddNotesPressed: (v0: boolean) => void;
@@ -13,6 +17,17 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [error, setError] = useState<boolean>(false);
+
+    const cardRef = useNoteCardAnimation();
+
+    // Animation for appearing
+    useEffect(() => {
+        gsap.fromTo(
+            cardRef.current,
+            { opacity: 0, scale: 0.9 },
+            { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }
+        );
+    }, []);
 
     const handleAdd = async () => {
         try {
@@ -47,40 +62,58 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
     const handleAddNote = () => {
         if (title.length === 0 || description.length === 0) {
             setError(true);
+
+            // Shake animation for error
+            gsap.to(cardRef.current, {
+                keyframes: [{ x: -5 }, { x: 5 }, { x: -5 }, { x: 5 }, { x: 0 }],
+                duration: 0.4,
+                ease: "power1.inOut",
+            });
+
             return;
         }
 
         setError(false);
-        setAddNotesPressed(false);
-        handleAdd();
+
+        // Success animation
+        gsap.to(cardRef.current, {
+            y: -20,
+            opacity: 0,
+            scale: 0.9,
+            duration: 0.3,
+            onComplete: () => {
+                setAddNotesPressed(false);
+                handleAdd();
+            },
+        });
     };
 
     return (
         <div
+            ref={cardRef}
             className={`${
-                error && "border-[1.5px] border-red-600"
-            } bg-gray-300 flex flex-col gap-3 p-6 h-[300px] rounded-lg text-black shadow-sm hover:shadow-xl shadow-black transition-shadow duration-300 cursor-pointer`}
+                error ? "border-2 border-red-300" : "border-gray-100"
+            } bg-secondary flex flex-col gap-3 p-6 rounded-lg text-primary border-2 border-popover shadow-sm transition-all`}
         >
             <input
                 type="text"
                 onChange={(e) => setTitle(e.target.value)}
-                className="outline-1 outline-double rounded-sm outline-black font-bold p-3 w-full"
+                className="font-medium text-lg p-3 w-full bg-transparent border-2 border-muted rounded-lg focus:border-primary outline-none transition-colors"
                 placeholder="Note Title"
             />
             <textarea
-                name=""
-                id=""
                 onChange={(e) => setDescription(e.target.value)}
-                className="border-[1px] outline-0 rounded-sm border-black h-full p-3"
+                className="h-full p-3 bg-transparent resize-none outline-none border-2 border-muted rounded-lg focus:border-primary"
                 placeholder="Note Description"
             ></textarea>
             <button
                 onClick={handleAddNote}
-                className="p-3 bg-secondary text-white rounded-md hover:bg-secondary/95 outline-0"
+                className="p-3 bg-anti-contrast text-white rounded-md hover:bg-popover transition-colors"
             >
                 Add Note
             </button>
         </div>
     );
 };
+
 export default AddNoteCard;
