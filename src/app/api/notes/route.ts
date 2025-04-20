@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     try {
         await connectMongo();
 
-        const session = await requireAuth(request);
+        const session = await requireAuth();
         const notes = await Note.find({ email: session.user?.email });
         
         return NextResponse.json({data: notes, message: "Notes fetched successfully"}, {status: 200})
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         await connectMongo();
-        const session = await requireAuth(request);
+        const session = await requireAuth();
         
         const {note_id, changes} = await request.json();
 
@@ -38,7 +38,7 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     try {
         await connectMongo();
-        await requireAuth(request);
+        await requireAuth();
         
         const {note_id} = await request.json();
 
@@ -53,8 +53,8 @@ export async function DELETE(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         await connectMongo();
+        await requireAuth();
         
-        await requireAuth(request);
         const newNote = await request.json();
 
         await Note.create(newNote);

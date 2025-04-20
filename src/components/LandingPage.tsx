@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { signIn } from "next-auth/react";
-import { useTheme } from "next-themes";
 import {
     ChevronRight,
     BookOpen,
