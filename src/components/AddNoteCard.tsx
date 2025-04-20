@@ -23,12 +23,16 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
     const addBtnRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
-        gsap.set(cardRef.current, {
-            scale: 0,
-            opacity: 0,
-        });
-
-        gsap.to(cardRef.current, { opacity: 1, scale: 1, duration: 0.4 });
+        gsap.fromTo(
+            cardRef.current,
+            { opacity: 0, y: -20 },
+            {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 1,
+            }
+        );
     }, []);
 
     const handleAdd = async () => {

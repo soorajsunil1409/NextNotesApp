@@ -46,7 +46,7 @@ const EmptyState = ({ onAddNote }: { onAddNote: () => void }) => {
             </p>
             <button
                 onClick={onAddNote}
-                className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg hover:opacity-90 transition-all"
+                className="flex items-center gap-2 bg-primary text-background px-5 py-2.5 rounded-lg hover:opacity-90 transition-all"
             >
                 <Plus className="w-5 h-5" />
                 Create Note
