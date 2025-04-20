@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { connectMongo } from "./DB";
 import { Note } from "@/models/Note";
 

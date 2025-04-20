@@ -24,7 +24,7 @@ export async function PUT(request: NextRequest) {
         
         const {note_id, changes} = await request.json();
 
-        const result = await Note.findOneAndUpdate(
+        await Note.findOneAndUpdate(
             { notes_id: note_id, email: session.user?.email },
             { $set: changes }
         );
@@ -38,7 +38,7 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     try {
         await connectMongo();
-        const session = await requireAuth(request);
+        await requireAuth(request);
         
         const {note_id} = await request.json();
 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         await connectMongo();
         
         await requireAuth(request);
-        let newNote = await request.json();
+        const newNote = await request.json();
 
         await Note.create(newNote);
     

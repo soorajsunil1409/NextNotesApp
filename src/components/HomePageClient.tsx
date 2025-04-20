@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import Note from "@/components/Note";
 import type { INote } from "@/models/Note";
-import { Plus, StickyNote, ArrowDown, Search } from "lucide-react";
+import { Plus, StickyNote, Search } from "lucide-react";
 import {
     useMainAnimation,
     useNotesAnimation,
@@ -13,7 +13,6 @@ import { useSearchStore } from "@/stores/useSearchStore";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { useSession } from "next-auth/react";
-import { toast } from "react-toastify";
 
 const AddNoteCard = dynamic(() => import("@/components/AddNoteCard"));
 
@@ -254,7 +253,7 @@ const HomePageClient = ({ notes: initialNotes }: { notes: INote[] }) => {
                                 {filteredNotes.length === 1
                                     ? "result"
                                     : "results"}{" "}
-                                for "{query}"
+                                for &quot;{query}&quot;
                             </span>
                         </div>
                     )}

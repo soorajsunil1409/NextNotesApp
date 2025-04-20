@@ -14,31 +14,25 @@ import gsap from "gsap";
 
 const LandingPage = () => {
     const [isHovering, setIsHovering] = useState(false);
-    const { theme } = useTheme();
 
-    // Refs for GSAP animations
     const headingRef = useRef<HTMLHeadingElement>(null);
     const descriptionRef = useRef<HTMLParagraphElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const featuresRef = useRef<HTMLDivElement>(null);
 
-    // Use proper typing for the feature refs array
     const featureRefs = useRef<Array<HTMLDivElement | null>>([]);
 
     const handleSignIn = () => {
         signIn("google");
     };
 
-    // Setup GSAP animations on component mount
     useEffect(() => {
-        // Make sure elements are visible before animations
         gsap.set(
             [headingRef.current, descriptionRef.current, buttonRef.current],
             { opacity: 1 }
         );
         gsap.set(featureRefs.current, { opacity: 1 });
 
-        // Initial animations
         const tl = gsap.timeline();
 
         tl.from(headingRef.current, {
@@ -70,7 +64,6 @@ const LandingPage = () => {
             "-=0.3"
         );
 
-        // Stagger animation for features - filter out null values
         tl.from(featureRefs.current, {
             opacity: 0,
             y: 20,
@@ -80,12 +73,10 @@ const LandingPage = () => {
         });
 
         return () => {
-            // Clean up animations if needed
             tl.kill();
         };
     }, []);
 
-    // Button hover animation
     useEffect(() => {
         if (isHovering) {
             gsap.to(".chevron-icon", {

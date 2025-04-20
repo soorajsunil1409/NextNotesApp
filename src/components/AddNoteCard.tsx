@@ -14,7 +14,7 @@ interface IAddNoteCard {
 }
 
 const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [error, setError] = useState<boolean>(false);
@@ -25,7 +25,7 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
     useEffect(() => {
         gsap.fromTo(
             cardRef.current,
-            { opacity: 0, y: -20 },
+            { opacity: 0, y: 20 },
             {
                 opacity: 1,
                 scale: 1,
@@ -58,16 +58,20 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
                 body: JSON.stringify(note),
             });
 
-            const { data, message } = await res.json();
+            const { message } = await res.json();
 
             if (res.ok) {
                 toast.success(message);
             } else {
                 toast.error(message);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.log(err);
-            toast.error(err);
+            if (err instanceof Error) {
+                toast.error(err.message);
+            } else {
+                toast.error("Something went wrong");
+            }
         }
     };
 

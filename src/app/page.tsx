@@ -8,8 +8,10 @@ import { INote } from "@/models/Note";
 const HomePage = async () => {
     const session = await getServerSession(authOption);
 
-    if (session) {
-        const notes: INote[] = await getUserNotes(session.user?.email!);
+    const email = session?.user?.email;
+
+    if (email) {
+        const notes: INote[] = await getUserNotes(email);
         const simplifiedNotes = notes.map((note) => ({
             notes_id: note.notes_id,
             email: note.email,

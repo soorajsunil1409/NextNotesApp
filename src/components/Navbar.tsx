@@ -2,7 +2,6 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import ThemeToggle from "./ThemeToggle";
 import { useSearchStore } from "@/stores/useSearchStore";
 import { Moon, Sun, UserCircle2 } from "lucide-react";
 import { useState } from "react";
