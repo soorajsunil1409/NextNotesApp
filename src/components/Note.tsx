@@ -1,64 +1,47 @@
 "use client";
 
-import type { INote } from "@/models/Note";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useState } from "react";
+import {
+    Bookmark,
+    BookmarkCheck,
+    Clock,
+    Pencil,
+    Trash2,
+    X,
+} from "lucide-react";
+import { INote } from "@/models/Note";
+import { useNoteCardAnimation } from "@/components/animations";
+import { formatDistanceToNow } from "date-fns";
 import { toast } from "react-toastify";
-import { useNoteCardAnimation } from "./animations";
 import gsap from "gsap";
-import { Ellipsis, Trash2, StickyNote, X } from "lucide-react";
+import EditFields from "./EditFields";
 
-export const Note = React.memo(
-    ({
-        note,
-        onDelete,
-    }: {
-        note: INote;
-        onDelete: (notesId: string) => void;
-    }) => {
+interface NoteProps {
+    note: INote;
+    onDelete: (id: string) => void;
+    editNotes: (note: INote) => void;
+    viewMode?: "grid" | "list";
+}
+
+const Note = React.memo(
+    ({ note, onDelete, editNotes, viewMode = "grid" }: NoteProps) => {
+        const [isMarked, setIsMarked] = useState<boolean>(note.marked);
+
         const [currentNote, setCurrentNote] = useState<INote>(note);
         const [isUpdating, setIsUpdating] = useState<boolean>(false);
-        const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
         const [isEditing, setIsEditing] = useState<boolean>(false);
 
         const [editedTitle, setEditedTitle] = useState<string>("");
         const [editedDesc, setEditedDesc] = useState<string>("");
+        const [error, setError] = useState<boolean>(false);
 
-        const overlayRef = useRef<HTMLDivElement>(null);
-        const overlayCardRef = useRef<HTMLDivElement>(null);
         const cardRef = useNoteCardAnimation();
         const statusBtnRef = useRef<HTMLButtonElement>(null);
-        const menuRef = useRef<HTMLDivElement>(null);
 
-        useEffect(() => {
-            const handleClickOutside = (event: MouseEvent) => {
-                if (
-                    menuRef.current &&
-                    !menuRef.current.contains(event.target as Node)
-                ) {
-                    setIsMenuOpen(false);
-                }
-            };
-
-            document.addEventListener("mousedown", handleClickOutside);
-
-            return () => {
-                document.removeEventListener("mousedown", handleClickOutside);
-            };
-        }, []);
-
-        useEffect(() => {
-            if (!statusBtnRef.current) return;
-
-            gsap.fromTo(
-                statusBtnRef.current,
-                { scale: 0.9, opacity: 0.8 },
-                { scale: 1, opacity: 1, duration: 0.3, ease: "power1.out" }
-            );
-        }, [currentNote.marked]);
-
-        const handleMarkedNote = async () => {
+        const handleToggleMark = async () => {
             try {
                 if (isUpdating) return;
+                setIsMarked((prev) => !prev);
 
                 setIsUpdating(true);
 
@@ -91,6 +74,7 @@ export const Note = React.memo(
 
                     toast.success(message);
                     setCurrentNote(newNote);
+                    editNotes(newNote);
                 } else {
                     toast.error(message);
                 }
@@ -101,39 +85,20 @@ export const Note = React.memo(
             }
         };
 
+        const formattedDate = formatDistanceToNow(new Date(note.date_added), {
+            addSuffix: true,
+        });
+
         const handleEdit = () => {
-            setIsMenuOpen(false);
-            setIsEditing(true);
+            setIsEditing((prev) => !prev);
 
-            setEditedTitle(note.title);
-            setEditedDesc(note.description);
-        };
-
-        const handleCloseEdit = () => {
-            gsap.to(overlayRef.current, {
-                opacity: 0,
-                duration: 0.3,
-                onComplete: () => setIsEditing(false),
-            });
-
-            gsap.to(cardRef.current, {
-                clearProps: "all",
-                duration: 1,
-                ease: "power3.inOut",
-            });
+            setEditedTitle(currentNote.title);
+            setEditedDesc(currentNote.description);
         };
 
         const handleEditClick = async () => {
             if (editedTitle.length === 0) {
-                gsap.to(overlayCardRef.current, {
-                    keyframes: [
-                        { scale: 1.03 },
-                        { scale: 1 },
-                        { scale: 1.03 },
-                        { scale: 1 },
-                    ],
-                    duration: 0.1,
-                });
+                setError(true);
                 return;
             }
 
@@ -165,6 +130,8 @@ export const Note = React.memo(
                 } else {
                     toast.error(message);
                 }
+
+                setError(false);
             } catch (err: any) {
                 toast.error(err);
             }
@@ -175,7 +142,6 @@ export const Note = React.memo(
                 "Are you sure you want to delete this note?"
             );
             if (!confirmDelete) {
-                setIsMenuOpen(false);
                 return;
             }
 
@@ -200,111 +166,150 @@ export const Note = React.memo(
             }
         };
 
-        return (
-            <div className="flex">
+        if (viewMode === "list") {
+            return (
                 <div
                     ref={cardRef}
-                    className="relative flex flex-col bg-secondary p-6 rounded-lg shadow-[0px_4px_16px_rgba(17,17,26,0.1),_0px_8px_24px_rgba(17,17,26,0.1),_0px_16px_56px_rgba(17,17,26,0.1)] border-popover h-[250px] gap-3 overflow-hidden transition-all"
+                    className={`bg-secondary rounded-lg p-4 overflow-hidden transition-all duration-200 flex gap-4 relative ${
+                        isMarked ? "border-l-4 border-primary" : ""
+                    } ${error ? "border-l-4 border-red-500" : ""}`}
                 >
-                    <div className="flex flex-col gap-3 h-[90%] w-[300px]">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-medium text-primary">
-                                {currentNote.title}
-                            </h2>
-                            <button
-                                className="h-full text-primary"
-                                onClick={() => setIsMenuOpen((prev) => !prev)}
-                            >
-                                <Ellipsis />
-                            </button>
-                        </div>
-                        <p className="text-primary-foreground line-clamp-5">
-                            {currentNote.description}
-                        </p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <div className="text-sm text-primary">
-                            {note.date_added}
-                        </div>
-                        <button
-                            ref={statusBtnRef}
-                            onClick={handleMarkedNote}
-                            disabled={isUpdating}
-                            className={`text-sm w-fit font-medium px-4 py-2 rounded-full transition-colors ${
-                                currentNote.marked
-                                    ? "bg-green-50 text-green-600"
-                                    : "bg-amber-50 text-amber-600"
-                            }`}
-                        >
-                            {isUpdating
-                                ? "Updating..."
-                                : currentNote.marked
-                                ? "Done"
-                                : "Pending"}
-                        </button>
+                    <div className="flex-grow">
+                        {isEditing ? (
+                            <div className="flex gap-5 items-center">
+                                <EditFields
+                                    editedDesc={editedDesc}
+                                    editedTitle={editedTitle}
+                                    setEditedDesc={setEditedDesc}
+                                    setEditedTitle={setEditedTitle}
+                                />
+                                <button
+                                    onClick={handleEditClick}
+                                    className="bg-anti-contrast p-3 px-6 h-fit text-md rounded-lg text-white font-bold"
+                                >
+                                    Edit Note
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <h3 className="text-lg font-medium text-primary truncate">
+                                        {currentNote.title}
+                                    </h3>
+                                </div>
+                                <p className="text-primary/70 line-clamp-1 mb-2">
+                                    {currentNote.description}
+                                </p>
+                                <div className="flex items-center gap-2 text-xs text-primary/50">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{formattedDate}</span>
+                                </div>
+                            </>
+                        )}
                     </div>
 
-                    {isMenuOpen && (
-                        <div
-                            ref={menuRef}
-                            className="absolute overflow-hidden shadow-xl right-6 top-14 bg-white flex flex-col justify-start text-sm rounded-md"
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleToggleMark}
+                            className="p-2 text-primary/70 hover:text-primary transition-colors"
                         >
-                            <button
-                                onClick={handleEdit}
-                                className="flex gap-2 px-4 py-2 items-center h-full w-full hover:bg-gray-200"
-                            >
-                                <StickyNote />
-                                Edit
-                            </button>
-                            <button
-                                onClick={handleDeleteClick}
-                                className="w-fit flex px-4 py-2 gap-2 text-red-500 items-center hover:bg-gray-200"
-                            >
-                                <Trash2 />
-                                Delete
-                            </button>
+                            {isMarked ? (
+                                <BookmarkCheck className="w-5 h-5" />
+                            ) : (
+                                <Bookmark className="w-5 h-5" />
+                            )}
+                        </button>
+                        <button
+                            onClick={handleEdit}
+                            className="p-2 text-primary/70 hover:text-primary transition-colors"
+                        >
+                            <Pencil className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={handleDeleteClick}
+                            className="p-2 text-primary/70 hover:text-red-500 transition-colors"
+                        >
+                            <Trash2 className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div
+                ref={cardRef}
+                className={`bg-secondary rounded-lg overflow-hidden transition-all duration-200 flex flex-col h-[200px] relative ${
+                    isMarked ? "border-t-4 border-primary" : ""
+                } ${error ? "border-t-4 border-red-500" : ""}`}
+            >
+                <div className="p-4 flex-grow overflow-hidden">
+                    {isEditing ? (
+                        <div className="flex flex-col gap-2 h-full">
+                            <EditFields
+                                editedDesc={editedDesc}
+                                editedTitle={editedTitle}
+                                setEditedDesc={setEditedDesc}
+                                setEditedTitle={setEditedTitle}
+                            />
                         </div>
+                    ) : (
+                        <>
+                            <h3 className="text-lg font-medium text-primary mb-2 line-clamp-1">
+                                {currentNote.title}
+                            </h3>
+                            <p className="text-primary/70 line-clamp-4 text-sm">
+                                {currentNote.description}
+                            </p>
+                        </>
                     )}
                 </div>
-                {isEditing && (
-                    <div
-                        ref={overlayRef}
-                        className="absolute size-full backdrop-blur-sm z-10 top-0 left-0 flex pt-32 justify-center"
-                    >
-                        <button
-                            onClick={handleCloseEdit}
-                            className="bg-black absolute top-8 right-8 p-3 rounded-full text-white font-bold"
-                        >
-                            <X />
-                        </button>
-                        <div
-                            ref={overlayCardRef}
-                            className="flex flex-col gap-3 z-50 w-[400px] h-fit bg-white p-5 rounded-lg"
-                        >
-                            <div className="flex items-center justify-between">
-                                <input
-                                    className="text-xl font-medium bg-white outline-0 border-2 rounded-md p-2 w-full text-black"
-                                    value={editedTitle}
-                                    onChange={(e) =>
-                                        setEditedTitle(e.target.value)
-                                    }
-                                />
-                            </div>
-                            <textarea
-                                className="line-clamp-5 text-black bg-white outline-0 border-2 rounded-md p-2 h-full"
-                                value={editedDesc}
-                                onChange={(e) => setEditedDesc(e.target.value)}
-                            />
+
+                <div className="flex items-center justify-between p-3 pt-2 border-t border-primary/10 bg-secondary">
+                    <div className="flex items-center gap-1 text-xs text-primary/50">
+                        {isEditing ? (
                             <button
                                 onClick={handleEditClick}
-                                className="bg-anti-contrast p-3 text-xl rounded-lg text-white font-bold"
+                                className="bg-anti-contrast p-2 px-10 text-md rounded-lg text-white font-bold"
                             >
                                 Edit Note
                             </button>
-                        </div>
+                        ) : (
+                            <>
+                                <Clock className="w-3 h-3" />
+                                <span>{formattedDate}</span>
+                            </>
+                        )}
                     </div>
-                )}
+
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={handleToggleMark}
+                            className="p-1.5 text-primary/70 hover:text-primary transition-colors"
+                        >
+                            {isMarked ? (
+                                <BookmarkCheck className="w-4 h-4" />
+                            ) : (
+                                <Bookmark className="w-4 h-4" />
+                            )}
+                        </button>
+                        <button
+                            onClick={handleEdit}
+                            className="p-1.5 text-primary/70 hover:text-primary transition-colors"
+                        >
+                            <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={handleDeleteClick}
+                            className="p-1.5 text-primary/70 hover:text-red-500 transition-colors"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }
 );
+
+export default Note;

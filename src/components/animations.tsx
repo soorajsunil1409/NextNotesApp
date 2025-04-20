@@ -33,16 +33,18 @@ export const useNotesAnimation = () => {
 
         const noteCards = notesContainerRef.current.children;
 
-        // gsap.fromTo(
-        //     noteCards,
-        //     { opacity: 0, scale: 0 },
-        //     {
-        //         opacity: 1,
-        //         scale: 1,
-        //         duration: 1,
-        //         stagger: 0.05,
-        //     }
-        // );
+        gsap.fromTo(
+            noteCards,
+            { opacity: 0, y: 20 },
+            {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 0.2,
+                stagger: 0.1,
+                ease: "power3.out",
+            }
+        );
 
         return () => {
             gsap.killTweensOf(noteCards);
@@ -116,14 +118,15 @@ export const useNoteCardAnimation = () => {
         // Hover animation
         const enterAnimation = () => {
             gsap.to(cardRef.current, {
-                y: -5,
-                duration: 0.1,
+                boxShadow: "0 3px 10px rgb(0,0,0,0.2)",
+                duration: 0.05,
             });
         };
 
         const leaveAnimation = () => {
             gsap.to(cardRef.current, {
                 y: 0,
+                boxShadow: "",
                 duration: 0.1,
             });
         };

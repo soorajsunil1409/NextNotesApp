@@ -2,10 +2,11 @@
 
 import type { INote } from "@/models/Note";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { useNoteCardAnimation } from "./animations";
 import gsap from "gsap";
+import { Plus } from "lucide-react";
 
 interface IAddNoteCard {
     setAddNotesPressed: (v0: boolean) => void;
@@ -19,8 +20,8 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
     const [error, setError] = useState<boolean>(false);
 
     const cardRef = useNoteCardAnimation();
+    const addBtnRef = useRef<HTMLButtonElement>(null);
 
-    // Animation for appearing
     useEffect(() => {
         gsap.set(cardRef.current, {
             scale: 0,
@@ -46,6 +47,7 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
                 date_added: now,
                 marked: false,
             };
+            setNotes((prev) => [note as INote, ...prev]);
 
             const res = await fetch("/api/notes", {
                 method: "POST",
@@ -59,8 +61,6 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
             } else {
                 toast.error(message);
             }
-
-            setNotes((prev) => [data as INote, ...prev]);
         } catch (err: any) {
             console.log(err);
             toast.error(err);
@@ -82,40 +82,61 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
 
         setError(false);
 
-        // Success animation
-        gsap.to(cardRef.current, {
-            x: -1000,
+        // Add button animation
+        gsap.to(addBtnRef.current, {
+            scale: 1.1,
+            duration: 0.2,
             onComplete: () => {
-                setAddNotesPressed(false);
-                handleAdd();
+                gsap.to(addBtnRef.current, {
+                    scale: 1,
+                    duration: 0.2,
+                });
             },
         });
+
+        setAddNotesPressed(false);
+        handleAdd();
     };
 
     return (
         <div
             ref={cardRef}
-            className={`${
-                error ? "border-2 border-red-300" : "border-gray-100"
-            } bg-secondary flex flex-col gap-3 p-6 rounded-lg text-primary border-2 border-popover shadow-sm transition-all`}
+            className={`bg-secondary rounded-lg overflow-hidden transition-all duration-200 flex flex-col h-[200px] relative ${
+                error ? "border-t-4 border-red-500" : ""
+            }`}
         >
-            <input
-                type="text"
-                onChange={(e) => setTitle(e.target.value)}
-                className="font-medium text-lg p-3 w-full bg-transparent border-2 border-muted rounded-lg focus:border-primary outline-none transition-colors"
-                placeholder="Note Title"
-            />
-            <textarea
-                onChange={(e) => setDescription(e.target.value)}
-                className="h-full p-3 bg-transparent resize-none outline-none border-2 border-muted rounded-lg focus:border-primary"
-                placeholder="Note Description"
-            ></textarea>
-            <button
-                onClick={handleAddNote}
-                className="p-3 bg-anti-contrast text-white rounded-md hover:bg-popover transition-colors"
-            >
-                Add Note
-            </button>
+            <div className="p-4 flex-grow overflow-hidden flex flex-col gap-2">
+                <input
+                    type="text"
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="font-medium text-lg bg-transparent w-full outline-none text-primary placeholder:text-primary/50"
+                    placeholder="Note Title"
+                />
+                <textarea
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="text-primary/70 text-sm h-full w-full bg-transparent resize-none outline-none"
+                    placeholder="Note Description"
+                ></textarea>
+            </div>
+
+            <div className="flex items-center justify-between p-3 pt-2 border-t border-primary/10 bg-secondary">
+                <div className="flex items-center gap-1 text-xs text-primary/50">
+                    {error && (
+                        <span className="text-red-500">Fill all fields</span>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-1 mt-1">
+                    <button
+                        ref={addBtnRef}
+                        onClick={handleAddNote}
+                        className="bg-black text-white p-2 px-5 pr-7 rounded-md flex items-center gap-1"
+                    >
+                        <Plus className="w-4 h-4" />
+                        <span className="text-sm font-medium">Add Note</span>
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };
