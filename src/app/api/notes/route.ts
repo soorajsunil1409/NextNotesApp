@@ -4,7 +4,7 @@ import { requireAuth } from "@/utils/authSession";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         await connectMongo();
 
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     try {
         await connectMongo();
         await requireAuth();
-        
+
         const newNote = await request.json();
 
         await Note.create(newNote);
