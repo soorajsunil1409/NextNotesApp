@@ -5,6 +5,7 @@ export interface INote {
     email: string,
     title: string,
     description: string,
+    date_added: string,
     marked: boolean
 }
 
@@ -25,6 +26,10 @@ const NoteSchema = new Schema({
     description: {
         type: String,
         required: false
+    },
+    date_added: {
+        type: String,
+        required: true
     },
     marked: {
         type: Boolean,

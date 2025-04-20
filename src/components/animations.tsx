@@ -13,7 +13,7 @@ export const useMainAnimation = () => {
         gsap.fromTo(
             containerRef.current,
             { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+            { opacity: 1, y: 0, duration: 0.8 }
         );
 
         return () => {
@@ -33,18 +33,16 @@ export const useNotesAnimation = () => {
 
         const noteCards = notesContainerRef.current.children;
 
-        gsap.fromTo(
-            noteCards,
-            { opacity: 0, y: 30, scale: 0.95 },
-            {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 0.5,
-                stagger: 0.1,
-                ease: "power2.out",
-            }
-        );
+        // gsap.fromTo(
+        //     noteCards,
+        //     { opacity: 0, scale: 0 },
+        //     {
+        //         opacity: 1,
+        //         scale: 1,
+        //         duration: 1,
+        //         stagger: 0.05,
+        //     }
+        // );
 
         return () => {
             gsap.killTweensOf(noteCards);
@@ -72,6 +70,7 @@ export const useAddButtonAnimation = () => {
         const enterAnimation = () => {
             gsap.to(buttonRef.current, {
                 scale: 1.1,
+                rotation: -90,
                 duration: 0.3,
                 ease: "power1.out",
             });
@@ -80,6 +79,7 @@ export const useAddButtonAnimation = () => {
         const leaveAnimation = () => {
             gsap.to(buttonRef.current, {
                 scale: 1,
+                rotation: 0,
                 duration: 0.3,
                 ease: "power1.out",
             });
@@ -117,18 +117,14 @@ export const useNoteCardAnimation = () => {
         const enterAnimation = () => {
             gsap.to(cardRef.current, {
                 y: -5,
-                boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
-                duration: 0.3,
-                ease: "power2.out",
+                duration: 0.1,
             });
         };
 
         const leaveAnimation = () => {
             gsap.to(cardRef.current, {
                 y: 0,
-                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.05)",
-                duration: 0.3,
-                ease: "power2.out",
+                duration: 0.1,
             });
         };
 

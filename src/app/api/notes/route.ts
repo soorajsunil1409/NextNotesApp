@@ -35,6 +35,21 @@ export async function PUT(request: NextRequest) {
     }
 }
 
+export async function DELETE(request: NextRequest) {
+    try {
+        await connectMongo();
+        const session = await requireAuth(request);
+        
+        const {note_id} = await request.json();
+
+        await Note.deleteOne({notes_id: note_id});
+    
+        return NextResponse.json({message: "Note Deleted successfully"}, {status: 200});
+    } catch (error) {
+        return NextResponse.json({message: error}, {status: 500})
+    }
+}
+
 export async function POST(request: NextRequest) {
     try {
         await connectMongo();

@@ -17,6 +17,7 @@ const HomePage = async () => {
         email: note.email,
         title: note.title,
         description: note.description,
+        date_added: note.date_added,
         marked: note.marked,
     }));
 

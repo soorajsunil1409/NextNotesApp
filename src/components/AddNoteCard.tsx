@@ -22,20 +22,28 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
 
     // Animation for appearing
     useEffect(() => {
-        gsap.fromTo(
-            cardRef.current,
-            { opacity: 0, scale: 0.9 },
-            { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }
-        );
+        gsap.set(cardRef.current, {
+            scale: 0,
+            opacity: 0,
+        });
+
+        gsap.to(cardRef.current, { opacity: 1, scale: 1, duration: 0.4 });
     }, []);
 
     const handleAdd = async () => {
         try {
+            const now = new Date(Date.now())
+                .toString()
+                .split(" ")
+                .slice(1, 5)
+                .join(" ");
+
             const note = {
                 notes_id: Date.now().toString(),
                 title: title,
                 email: session?.user?.email,
                 description: description,
+                date_added: now,
                 marked: false,
             };
 
@@ -63,11 +71,10 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
         if (title.length === 0 || description.length === 0) {
             setError(true);
 
-            // Shake animation for error
             gsap.to(cardRef.current, {
-                keyframes: [{ x: -5 }, { x: 5 }, { x: -5 }, { x: 5 }, { x: 0 }],
-                duration: 0.4,
-                ease: "power1.inOut",
+                keyframes: [{ scale: 1.05 }, { scale: 1 }],
+                duration: 0.3,
+                ease: "power2.inOut",
             });
 
             return;
@@ -77,10 +84,7 @@ const AddNoteCard = ({ setAddNotesPressed, setNotes }: IAddNoteCard) => {
 
         // Success animation
         gsap.to(cardRef.current, {
-            y: -20,
-            opacity: 0,
-            scale: 0.9,
-            duration: 0.3,
+            x: -1000,
             onComplete: () => {
                 setAddNotesPressed(false);
                 handleAdd();

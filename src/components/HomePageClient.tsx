@@ -33,6 +33,10 @@ const HomePageClient = ({ notes: initialNotes }: { notes: INote[] }) => {
         );
     }, [notes, query]);
 
+    const handleDeleteNote = (noteId: string) => {
+        setNotes((prev) => prev.filter((n) => n.notes_id !== noteId));
+    };
+
     return (
         <div
             ref={containerRef}
@@ -55,7 +59,11 @@ const HomePageClient = ({ notes: initialNotes }: { notes: INote[] }) => {
                     )}
 
                     {filteredNotes?.map((note) => (
-                        <Note key={note.notes_id} note={note} />
+                        <Note
+                            key={note.notes_id}
+                            note={note}
+                            onDelete={handleDeleteNote}
+                        />
                     ))}
 
                     {filteredNotes?.length === 0 && !addNotesPressed && (
