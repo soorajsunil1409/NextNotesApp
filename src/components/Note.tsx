@@ -205,7 +205,12 @@ const NoteComponent = ({
                                 </h3>
                             </div>
                             <p className="text-primary/70 text-sm line-clamp-1 mb-2">
-                                {currentNote.description.slice(0, 30)}...
+                                {currentNote.description.length > 30
+                                    ? `${currentNote.description.slice(
+                                          0,
+                                          30
+                                      )}...`
+                                    : currentNote.description}
                             </p>
                             <div className="flex items-center gap-2 text-xs text-primary/50">
                                 <Clock className="w-3 h-3" />
@@ -215,7 +220,7 @@ const NoteComponent = ({
                     )}
                 </div>
 
-                <div className="flex items-center md:gap-2">
+                <div className="flex items-center md:gap-2 -translate-x-1 md:translate-x-0">
                     <button
                         onClick={handleToggleMark}
                         className="p-2 text-primary/70 hover:text-primary transition-colors"
