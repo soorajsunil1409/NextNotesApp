@@ -119,7 +119,7 @@ const LandingPage = () => {
     ];
 
     return (
-        <div className="flex flex-col min-h-[calc(100vh-160px)] bg-background text-primary">
+        <div className="flex flex-col min-h-[calc(100vh-160px)] bg-background text-primary p-3">
             <div className="flex-grow flex flex-col items-center justify-center px-4 md:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-12">
                     <h1

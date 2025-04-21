@@ -183,7 +183,7 @@ const NoteComponent = ({
             >
                 <div className="flex-grow">
                     {isEditing ? (
-                        <div className="flex gap-5 items-center">
+                        <div className="flex sm:flex-row flex-col md:gap-5 sm:items-center items-start">
                             <EditFields
                                 editedDesc={editedDesc}
                                 editedTitle={editedTitle}
@@ -192,7 +192,7 @@ const NoteComponent = ({
                             />
                             <button
                                 onClick={handleEditClick}
-                                className="bg-anti-contrast p-3 px-6 h-fit text-md rounded-lg text-white font-bold"
+                                className="bg-anti-contrast sm:p-3 p-1 px-6 h-fit text-sm rounded-lg text-white font-bold"
                             >
                                 Edit Note
                             </button>
@@ -204,7 +204,7 @@ const NoteComponent = ({
                                     {currentNote.title}
                                 </h3>
                             </div>
-                            <p className="text-primary/70 line-clamp-1 mb-2">
+                            <p className="text-primary/70 text-sm line-clamp-1 mb-2">
                                 {currentNote.description}
                             </p>
                             <div className="flex items-center gap-2 text-xs text-primary/50">
@@ -215,7 +215,7 @@ const NoteComponent = ({
                     )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 md:gap-2">
                     <button
                         onClick={handleToggleMark}
                         className="p-2 text-primary/70 hover:text-primary transition-colors"

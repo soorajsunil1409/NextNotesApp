@@ -32,7 +32,7 @@ const EmptyState = ({ onAddNote }: { onAddNote: () => void }) => {
     return (
         <div
             ref={emptyStateRef}
-            className="col-span-full flex flex-col items-center justify-center py-16 px-4"
+            className="col-span-full flex flex-col items-center justify-center py-16 px-10"
         >
             <div className="bg-secondary/50 rounded-full p-6 mb-6">
                 <StickyNote className="w-12 h-12 text-primary/50" />
@@ -125,12 +125,12 @@ const HomePageClient = ({ notes: initialNotes }: { notes: INote[] }) => {
     return (
         <div
             ref={containerRef}
-            className="bg-background text-primary flex-grow pt-6 px-6 md:px-12"
+            className="bg-background text-primary flex-grow md:pt-6 px-6 md:px-12"
         >
             <main className="max-w-6xl mx-auto">
                 <div ref={headerRef} className="mb-8">
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-3xl font-medium">
+                        <h1 className="md:text-3xl text-xl font-medium">
                             {session?.user?.name
                                 ? `${session.user.name.split(" ")[0]}'s Notes`
                                 : "My Notes"}
@@ -139,7 +139,7 @@ const HomePageClient = ({ notes: initialNotes }: { notes: INote[] }) => {
                             <div className="flex bg-secondary rounded-lg overflow-hidden">
                                 <button
                                     onClick={() => handleSort("newest")}
-                                    className={`px-3 py-1.5 text-sm ${
+                                    className={`px-2 text-xs md:px-3 py-1.5 md:text-sm ${
                                         sortOrder === "newest"
                                             ? "bg-anti-contrast text-white"
                                             : "text-primary/70 hover:bg-primary/10"
@@ -149,7 +149,7 @@ const HomePageClient = ({ notes: initialNotes }: { notes: INote[] }) => {
                                 </button>
                                 <button
                                     onClick={() => handleSort("oldest")}
-                                    className={`px-3 py-1.5 text-sm ${
+                                    className={`px-2 text-xs md:px-3 py-1.5 md:text-sm ${
                                         sortOrder === "oldest"
                                             ? "bg-anti-contrast text-white"
                                             : "text-primary/70 hover:bg-primary/10"
@@ -159,7 +159,7 @@ const HomePageClient = ({ notes: initialNotes }: { notes: INote[] }) => {
                                 </button>
                                 <button
                                     onClick={() => handleSort("marked")}
-                                    className={`px-3 py-1.5 text-sm ${
+                                    className={`px-2 text-xs md:px-3 py-1.5 md:text-sm ${
                                         sortOrder === "marked"
                                             ? "bg-anti-contrast text-white"
                                             : "text-primary/70 hover:bg-primary/10"
