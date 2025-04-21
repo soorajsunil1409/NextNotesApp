@@ -177,7 +177,7 @@ const NoteComponent = ({
         return (
             <div
                 ref={cardRef}
-                className={`bg-secondary rounded-lg p-4 overflow-hidden transition-all duration-200 flex gap-4 relative ${
+                className={`bg-secondary rounded-lg p-4 overflow-hidden transition-all duration-200 flex md:gap-4 relative ${
                     isMarked ? "border-l-4 border-primary" : ""
                 } ${error ? "border-l-4 border-red-500" : ""}`}
             >
@@ -205,7 +205,7 @@ const NoteComponent = ({
                                 </h3>
                             </div>
                             <p className="text-primary/70 text-sm line-clamp-1 mb-2">
-                                {currentNote.description}
+                                {currentNote.description.slice(0, 30)}...
                             </p>
                             <div className="flex items-center gap-2 text-xs text-primary/50">
                                 <Clock className="w-3 h-3" />
@@ -215,7 +215,7 @@ const NoteComponent = ({
                     )}
                 </div>
 
-                <div className="flex items-center gap-1 md:gap-2">
+                <div className="flex items-center md:gap-2">
                     <button
                         onClick={handleToggleMark}
                         className="p-2 text-primary/70 hover:text-primary transition-colors"
